@@ -1,0 +1,209 @@
+/*%FSM<COMPILE "C:\Program Files (x86)\Bohemia Interactive\Tools\FSM Editor Personal Edition\scriptedFSM.cfg, Life Client FSM">*/
+/*%FSM<HEAD>*/
+/*
+item0[] = {"Main_Init",0,250,-40.348839,-141.279068,49.651161,-91.279068,0.000000,"Main Init"};
+item1[] = {"true",8,218,-39.994308,-65.712906,50.005692,-15.712896,0.000000,"true"};
+item2[] = {"Split",2,250,-39.994308,10.874098,50.005707,60.874100,0.000000,"Split"};
+item3[] = {"Time_to_pay_",4,4314,-39.985916,96.230179,50.013962,146.230316,0.000000,"Time to pay?"};
+item4[] = {"_",2,250,-40.357071,184.631424,49.642761,234.631516,0.000000,""};
+item5[] = {"No_Chomage",4,218,-211.738373,185.451462,-121.738426,235.451508,0.000000,"No Chomage"};
+item6[] = {"Chomage",4,218,-123.997887,278.932129,-33.997917,328.932251,0.000000,"Chomage"};
+item7[] = {"Not_Civilian_",4,218,83.740959,184.631439,173.740967,234.631439,0.000000,"Not Civilian" \n ""};
+link0[] = {0,1};
+link1[] = {1,2};
+link2[] = {2,3};
+link3[] = {3,4};
+link4[] = {4,5};
+link5[] = {4,6};
+link6[] = {4,7};
+link7[] = {5,2};
+link8[] = {6,2};
+link9[] = {7,2};
+globals[] = {0.000000,0,0,0,0,640,480,1,33,6316128,1,-337.690857,221.171326,665.542969,-298.979858,518,672,1};
+window[] = {0,-1,-1,-1,-1,844,26,1801,26,1,536};
+*//*%FSM</HEAD>*/
+class FSM
+{
+  fsmName = "Life Client FSM";
+  class States
+  {
+    /*%FSM<STATE "Main_Init">*/
+    class Main_Init
+    {
+      name = "Main_Init";
+      init = /*%FSM<STATEINIT""">*/"private[""_lastcheck"",""_food"",""_water"",""_lastsync""];" \n
+       "_lastcheck = time;" \n
+       "_food = time;" \n
+       "_water = time;" \n
+       "_lastsync = time;"/*%FSM</STATEINIT""">*/;
+      precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+      class Links
+      {
+        /*%FSM<LINK "true">*/
+        class true
+        {
+          priority = 0.000000;
+          to="Split";
+          precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"true"/*%FSM</CONDITION""">*/;
+          action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+        };
+        /*%FSM</LINK>*/
+      };
+    };
+    /*%FSM</STATE>*/
+    /*%FSM<STATE "Split">*/
+    class Split
+    {
+      name = "Split";
+      init = /*%FSM<STATEINIT""">*/"systemChat format[localize ""STR_FSM_Paycheck"",(getNumber(missionConfigFile >> ""Life_Settings"" >> ""paycheck_period""))];"/*%FSM</STATEINIT""">*/;
+      precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+      class Links
+      {
+        /*%FSM<LINK "Time_to_pay_">*/
+        class Time_to_pay_
+        {
+          priority = 0.000000;
+          to="_";
+          precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(time - _lastcheck) > (10 * 60)"/*%FSM</CONDITION""">*/;
+          action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
+        };
+        /*%FSM</LINK>*/
+      };
+    };
+    /*%FSM</STATE>*/
+    /*%FSM<STATE "_">*/
+    class _
+    {
+      name = "_";
+      init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+      precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
+      class Links
+      {
+        /*%FSM<LINK "Chomage">*/
+        class Chomage
+        {
+          priority = 0.000000;
+          to="Split";
+          precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(life_chomage && playerSide isEqualTo civilian)"/*%FSM</CONDITION""">*/;
+          action=/*%FSM<ACTION""">*/"if (life_KavaBank < 500000)then" \n
+           "{" \n
+           "	if(!alive player) then {" \n
+           "		systemChat localize ""STR_FSM_MissedPay"";" \n
+           "	} else {" \n
+           "		life_paycheck = life_paycheck + 500;" \n
+           "		life_KavaBank = life_KavaBank + life_paycheck;" \n
+           "		systemChat format[localize ""STR_FSM_ReceivedPay"",[life_paycheck] call life_fnc_numberText];" \n
+           "	};" \n
+           "}else" \n
+           "{" \n
+           "	if(life_KavaBank > 5000000)then" \n
+           "	{" \n
+           "		_tmp2 = switch (call life_donator) do" \n
+           "		{" \n
+           "			case 0:{3};" \n
+           "			case 1:{2};" \n
+           "			case 2:{1};" \n
+           "			case 3:{0};" \n
+           "			default{3};" \n
+           "		};" \n
+           "		_tmp = round((life_KavaBank / 100) * _tmp2);" \n
+           "		life_KavaBank = life_KavaBank - _tmp;" \n
+           "		systemChat format[localize ""STR_FSM_PaidPay"",[_tmp] call life_fnc_numberText,""%"",_tmp2];" \n
+           "		" \n
+           "	}else" \n
+           "	{" \n
+           "		systemChat localize ""STR_FSM_NoPay"";" \n
+           "	};" \n
+           "};" \n
+           "	" \n
+           "_lastcheck = time;" \n
+           "" \n
+           "//Group clean (Local)" \n
+           "{" \n
+           "	if(local _x && {(count units _x isEqualTo 0)}) then {" \n
+           "		deleteGroup _x;" \n
+           "	};" \n
+           "} foreach allGroups;"/*%FSM</ACTION""">*/;
+        };
+        /*%FSM</LINK>*/
+        /*%FSM<LINK "Not_Civilian_">*/
+        class Not_Civilian_
+        {
+          priority = 0.000000;
+          to="Split";
+          precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(playerSide != civilian)"/*%FSM</CONDITION""">*/;
+          action=/*%FSM<ACTION""">*/"if(player distance (getMarkerPos ""fed_reserve"") < 120) then {" \n
+           "	systemChat format[localize ""STR_FSM_ReceivedPay"",[life_paycheck + 500] call life_fnc_numberText];" \n
+           "	life_KavaBank = life_KavaBank + life_paycheck + 500;" \n
+           "}else" \n
+           "{" \n
+           "	life_KavaBank = life_KavaBank + life_paycheck;" \n
+           "	systemChat format[localize ""STR_FSM_ReceivedPay"",[life_paycheck] call life_fnc_numberText];" \n
+           "};" \n
+           "" \n
+           "_lastcheck = time;" \n
+           "" \n
+           "//Group clean (Local)" \n
+           "{" \n
+           "	if(local _x && {(count units _x isEqualTo 0)}) then {" \n
+           "		deleteGroup _x;" \n
+           "	};" \n
+           "} foreach allGroups;"/*%FSM</ACTION""">*/;
+        };
+        /*%FSM</LINK>*/
+        /*%FSM<LINK "No_Chomage">*/
+        class No_Chomage
+        {
+          priority = 0.000000;
+          to="Split";
+          precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(!life_chomage && playerSide isEqualTo civilian)"/*%FSM</CONDITION""">*/;
+          action=/*%FSM<ACTION""">*/"if(life_KavaBank < 500000)then" \n
+           "{" \n
+           "	systemChat localize ""STR_FSM_MissedChom"";" \n
+           "}else" \n
+           "{" \n
+           "	if(life_KavaBank > 5000000)then" \n
+           "	{" \n
+           "		_tmp2 = switch (call life_donator) do" \n
+           "		{" \n
+           "			case 0:{5};" \n
+           "			case 1:{4};" \n
+           "			case 2:{3};" \n
+           "			case 3:{2};" \n
+           "			default{5};" \n
+           "		};" \n
+           "		_tmp = round((life_KavaBank / 100) * _tmp2);" \n
+           "		life_KavaBank = life_KavaBank - _tmp;" \n
+           "		systemChat format[localize ""STR_FSM_PaidPay"",[_tmp] call life_fnc_numberText,""%"",_tmp2];" \n
+           "		" \n
+           "	}else" \n
+           "	{" \n
+           "		systemChat localize ""STR_FSM_NoPay"";" \n
+           "	};" \n
+           "};" \n
+           "" \n
+           "_lastcheck = time;" \n
+           "" \n
+           "//Group clean (Local)" \n
+           "{" \n
+           "	if(local _x && {(count units _x isEqualTo 0)}) then {" \n
+           "		deleteGroup _x;" \n
+           "	};" \n
+           "} foreach allGroups;"/*%FSM</ACTION""">*/;
+        };
+        /*%FSM</LINK>*/
+      };
+    };
+    /*%FSM</STATE>*/
+  };
+  initState="Main_Init";
+  finalStates[] =
+  {
+  };
+};
+/*%FSM</COMPILE>*/
